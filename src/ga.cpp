@@ -7,31 +7,11 @@
 using namespace std;
 
 // 车辆数
-#define M 4
+#define M 6
 
 // 任务数
 //#define K 5
-#define K 7
-
-// 距离对应跳数
-#define DIS2HOP 1
-
-// hop
-#define HOPONE 5
-#define HOPTWO 10
-#define HOPTHREE 15
-
-// rate
-#define RATEONE 3
-#define RATETWO 2
-#define RATETHREE 1
-#define UNAVAILABLE 0
-
-// 传输有效半径
-#define AVAILABLERADIUS 10
-
-// 不可用 state
-#define UNAVAILABLESTATE 100
+#define K 14
 
 // GA 相关
 #define population 10
@@ -39,56 +19,41 @@ using namespace std;
 #define pCrossover 0.9
 #define pMutation 0.9
 
+
 class Task{
 public:
     int index;    // 序号
     double computation;    // 计算负载
     double transmission;    // 传输负载
-    int indegree;    // 入度
-    Task(int index, double computation, double transmission, int indegree) : index(index), computation(computation),
-                                                                             transmission(transmission),
-                                                                             indegree(indegree) {}
+//    Task next[];    // 后继任务
+//    int indegree;    // 入度
+    Task(int index, double computation, double transmission) : index(index), computation(computation), transmission(transmission) {}
 };
 
 class Vehicle{
 public:
     int index;    // 序号
     double capability;    // 处理能力
-    double cost;    // 服务成本
-    double positionX;    // 横坐标
-    double positionY;    // 纵坐标
-    double speedX;    // x 方向上的速度
-    double speedY;    // y 方向上的速度
-    double time;    // 将车辆坐标与时间关联，保存某一时刻的位置
+    double unitPrice;    // 服务成本
 
-    Vehicle(int index, double capability, double cost, double positionX, double positionY, double speedX, double speedY,
-            double time) : index(index), capability(capability), cost(cost), positionX(positionX), positionY(positionY),
-                           speedX(speedX), speedY(speedY), time(time) {}
+    Vehicle(int index, double capability, double unitPrice) : index(index), capability(capability), unitPrice(unitPrice) {}
 };
 
-void updatePosition(Vehicle v,double time){
-    double positionX=v.positionX;
-    double positionY=v.positionY;
-    double speedX=v.speedX;
-    double speedY=v.speedY;
-    double prevTime=v.time;
-    double newPositionX=positionX+speedX*(time-prevTime);
-    double newPositionY=positionY+speedY*(time-prevTime);
-    v.positionX=newPositionX;
-    v.positionY=newPositionY;
-    v.time=time;
+double getTransmissionRateFromHop(int hop){
+    double bandwidth[6]={0,10,4.8,3.2,2.4,1.92};
+    return bandwidth[hop];
 }
 
-double findTransmissionRate(Vehicle v1,Vehicle v2,double time){
-    double dis=sqrt(pow(v1.positionX-v2.positionX,2)+pow(v1.positionY-v2.positionY,2));
-    int hop=(int)dis/DIS2HOP;
-    if(hop<HOPONE){
-        return RATEONE;
-    }else if(hop<HOPTWO){
-        return RATETWO;
-    }else{
-        return RATETHREE;
-    }
+// 获取两车间的传输速率
+double getTransmissionRate(int v1,int v2){
+    int vehiclalNetworkTopology[M][M]={{0,1,2,2,3,2},
+                                       {1,0,3,2,2,1},
+                                       {2,3,0,2,3,2},
+                                       {2,2,2,0,1,3},
+                                       {3,2,3,1,0,2},
+                                       {2,1,2,3,3,0}};
+    int hop=vehiclalNetworkTopology[v1][v2];
+    return getTransmissionRateFromHop(hop);
 }
 
 /*// 根据公式 21，用整数编码 theta 的值，可以得到某个子任务对应车辆指标 v 和时间槽指标 h
@@ -245,26 +210,35 @@ void mutation(int single[],vector<int> thetaValue){
 int main() {
     // 第一部分：输入任务与车辆数据
     // 任务
-    Task t1(1,3.0,3.0,0);
-    Task t2(2,2.0,2.0,1);
-    Task t3(3,3.0,3.0,1);
-    Task t4(4,1.0,1.0,1);
-    Task t5(5,4.0,4.0,1);
-    Task t6(6,2.0,2.0,1);
-    Task t7(7,3.0,3.0,4);
+    Task t1(1,3,3);
+    Task t2(2,2,2);
+    Task t3(3,3,3);
+    Task t4(4,4,4);
+    Task t5(5,3,3);
+    Task t6(6,1,1);
+    Task t7(7,4,4);
+    Task t8(8,2,2);
+    Task t9(9,5,5);
+    Task t10(10,3,3);
+    Task t11(11,3,3);
+    Task t12(12,4,4);
+    Task t13(13,3,3);
+    Task t14(14,4,4);
 
-    Task tasks[K]={t1,t2,t3,t4,t5,t6,t7};
+    Task tasks[K]={t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14};
 
     // 车辆
-    Vehicle v1(1,2.0,4.0,0.0,0.0,2.0,1.0,0.0);
-    Vehicle v2(2,3.0,10.0,0.0,0.0,2.0,2.0,0.0);
-    Vehicle v3(3,4.0,18.4,0.0,0.0,2.0,3.0,0.0);
-    Vehicle v4(4,5.0,29.2,0.0,0.0,2.0,4.0,0.0);
+    Vehicle v1(1,5,30.8);
+    Vehicle v2(2,6,44);
+    Vehicle v3(3,7,59.6);
+    Vehicle v4(4,8,77.6);
+    Vehicle v5(5,9,98);
+    Vehicle v6(6,10,120.8);
 
-    Vehicle vehicles[M]={v1,v2,v3,v4};
+    Vehicle vehicles[M]={v1,v2,v3,v4,v5,v6};
 
     // 计价
-    // cost=(capability*capability*1.2)-0.8
+    // cost=capability￿￿^2*1.2+0.8
 
     // 循环添加随机初始数据
     /*Vehicle vehicles[M];
@@ -280,23 +254,26 @@ int main() {
     }*/
 
     // 邻接矩阵，保存任务依赖关系和传输数据
-    /*double dependency[K][K]={{ 0 , 0 , 0 , 0 , 0 },
-                             {3.0, 0 , 0 , 0 , 0 },
-                             {3.0, 0 , 0 , 0 , 0 },
-                             { 0 , 0 ,3.0, 0 , 0 },
-                             { 0 ,2.0, 0 ,1.0, 0 }};*/
-
-    double dependency[K][K]={{ 0 , 0 , 0 , 0 , 0 , 0 , 0 },
-                             {3.0, 0 , 0 , 0 , 0 , 0 , 0 },
-                             {3.0, 0 , 0 , 0 , 0 , 0 , 0 },
-                             { 0 , 0 ,3.0, 0 , 0 , 0 , 0 },
-                             { 0 , 0 ,3.0, 0 , 0 , 0 , 0 },
-                             { 0 , 0 ,3.0, 0 , 0 , 0 , 0 },
-                             { 0 ,2.0, 0 ,1.0,4.0,2.0, 0 }};
+    double dependency[K][K]={{0,0,0,0,0,0,0,0,0,0,0,0,0,0},  //1
+                             {3,0,0,0,0,0,0,0,0,0,0,0,0,0},  //2
+                             {3,0,0,0,0,0,0,0,0,0,0,0,0,0},  //3
+                             {3,0,0,0,0,0,0,0,0,0,0,0,0,0},  //4
+                             {3,0,0,0,0,0,0,0,0,0,0,0,0,0},  //5
+                             {0,0,3,0,0,0,0,0,0,0,0,0,0,0},  //6
+                             {0,0,3,0,0,0,0,0,0,0,0,0,0,0},  //7
+                             {0,0,3,0,0,0,0,0,0,0,0,0,0,0},  //8
+                             {0,0,0,4,0,0,0,0,0,0,0,0,0,0},  //9
+                             {0,0,0,4,3,0,0,0,0,0,0,0,0,0},  //10
+                             {0,2,0,0,0,1,4,2,0,0,0,0,0,0},  //11
+                             {0,0,0,0,0,0,4,0,0,0,0,0,0,0},  //12
+                             {0,0,0,0,0,0,4,0,0,0,0,0,0,0},  //13
+                             {0,0,0,0,0,0,0,0,0,3,3,0,3,0}}; //14
+    //1 2 3 4 5 6 7 8 9 1011121314
 
     // 车辆停留在 VC 的时间
-    // 根据车辆节点位置计算，也是循环添加随机初始数据
     double interval[M][2]={{ 0.0,20.0},
+                           { 0.0,20.0},
+                           { 0.0,20.0},
                            { 0.0,20.0},
                            { 0.0,20.0},
                            { 0.0,20.0}};
@@ -307,17 +284,17 @@ int main() {
      {11.0,20.0}};*/
 
     // 截止时间
-    double deadline=10.0;
+    double deadline=4.5;
 
     // RSU 对初始任务的输入，根据道路情况变化的传输速率
-    double inputTransmissionRSU=2.0;
+    double inputTransmissionRSU=2;
     double roadOneRate=1;
     double roadTwoRate=2;
     double roadThreeRate=3;
 
     double inputTransmissionTimeRSU=inputTransmissionRSU/roadThreeRate;
 
-    // 编码，任务对应车辆
+    // 编码，任务对应车辆，cost
 
 
     cout<<"thetaValue: "<<endl;
