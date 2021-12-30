@@ -3,7 +3,7 @@ package com.wind;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
-
+import java.util.Random;
 public class Main {
     static final int K=14;
     static final int M=6;
@@ -118,6 +118,75 @@ public class Main {
                 {2,1,2,3,3,0}};
         int hop=vehiclalNetworkTopology[v1][v2];
         return getTransmissionRateFromHop(hop);
+    }
+
+    /**
+     * 生成仅有对角线是0，其他数值在[min,max)的对角矩阵，左闭右开
+     * @param dim 矩阵维度
+     * @param max 最大值
+     * @param min 最小值
+     * @return 矩阵
+     */
+    static int[][] GenRandomSquareMatrix(int dim,int min,int max){
+
+        int[][] matrix = new int[dim][dim];
+        for(int i =0;i<dim;i++){
+            for(int j =0;j<dim;j++){
+                if(i==j){
+                    matrix[i][j] = 0;
+                }else if(i<j){
+                    matrix[i][j] = GenRandomInt(min,max-min);
+                }else{
+                    //i<<j
+                    matrix[i][j] = matrix[j][i] ;
+                }
+            }
+        }
+        return  matrix;
+    }
+
+    /**
+     *  生成N*2的汽车时间
+     * @param car_number 汽车数量
+     * @param start_time_minimun 开始时间最小值
+     * @param start_time_maximun 开始时间最大值
+     * @param finish_time_minimun 结束时间最小值
+     * @param finish_time_maximun 结束时间最大值
+     * @return 矩阵
+     */
+    static int[][] GenRandomCarInterval(int car_number,int start_time_minimun,int start_time_maximun,int finish_time_minimun,int finish_time_maximun){
+        int[][] matrix = new int[car_number][2];
+        for(int i =0;i<car_number;i++){
+            matrix[i][0] = GenRandomInt(start_time_minimun,start_time_maximun-start_time_minimun);
+            matrix[i][1] = GenRandomInt(finish_time_minimun,finish_time_maximun-finish_time_minimun);
+        }
+        return  matrix;
+    }
+
+
+    static double jiege(){
+        //huoqu jiange
+//        int[M][2]
+        return 0f;
+    }
+    static String Matix2Str(int[][] matrix){
+        int x_dim = matrix.length;
+        int y_dim = matrix[0].length;
+        StringBuilder builder = new StringBuilder();
+        for(int i =0;i<x_dim;i++){
+            builder.append("|");
+            for(int j =0;j<y_dim;j++){
+                builder.append(matrix[i][j]);
+                builder.append("|");
+            }
+            builder.append("\n");
+        }
+        return builder.toString();
+    }
+    static int GenRandomInt(int base,int range){
+        Random rand = new Random();
+        int a = rand.nextInt(range);
+        return base+a;
     }
 
     // 判断车辆节点是否可用
