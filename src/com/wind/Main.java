@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+
 public class Main {
     static final int K=14;
     static final int M=6;
@@ -127,15 +129,15 @@ public class Main {
      * @param min 最小值
      * @return 矩阵
      */
-    static int[][] GenRandomSquareMatrix(int dim,int min,int max){
+    static double[][] GenRandomSquareMatrix(int dim,int min,int max){
 
-        int[][] matrix = new int[dim][dim];
+        double[][] matrix = new double[dim][dim];
         for(int i =0;i<dim;i++){
             for(int j =0;j<dim;j++){
                 if(i==j){
                     matrix[i][j] = 0;
                 }else if(i<j){
-                    matrix[i][j] = GenRandomInt(min,max-min);
+                    matrix[i][j] = GenRandomDouble(min,max-min);
                 }else{
                     //i<<j
                     matrix[i][j] = matrix[j][i] ;
@@ -154,11 +156,11 @@ public class Main {
      * @param finish_time_maximun 结束时间最大值
      * @return 矩阵
      */
-    static int[][] GenRandomCarInterval(int car_number,int start_time_minimun,int start_time_maximun,int finish_time_minimun,int finish_time_maximun){
-        int[][] matrix = new int[car_number][2];
+    static double[][] GenRandomCarInterval(int car_number,int start_time_minimun,int start_time_maximun,int finish_time_minimun,int finish_time_maximun){
+        double[][] matrix = new double[car_number][2];
         for(int i =0;i<car_number;i++){
-            matrix[i][0] = GenRandomInt(start_time_minimun,start_time_maximun-start_time_minimun);
-            matrix[i][1] = GenRandomInt(finish_time_minimun,finish_time_maximun-finish_time_minimun);
+            matrix[i][0] = GenRandomDouble(start_time_minimun,start_time_maximun-start_time_minimun);
+            matrix[i][1] = GenRandomDouble(finish_time_minimun,finish_time_maximun-finish_time_minimun);
         }
         return  matrix;
     }
@@ -169,24 +171,31 @@ public class Main {
 //        int[M][2]
         return 0f;
     }
-    static String Matix2Str(int[][] matrix){
+    static String Matix2Str(double[][] matrix){
         int x_dim = matrix.length;
         int y_dim = matrix[0].length;
         StringBuilder builder = new StringBuilder();
         for(int i =0;i<x_dim;i++){
             builder.append("|");
             for(int j =0;j<y_dim;j++){
-                builder.append(matrix[i][j]);
+                String number_str = String.format("%1f", matrix[i][j]);
+                builder.append(number_str);
                 builder.append("|");
             }
             builder.append("\n");
         }
         return builder.toString();
     }
-    static int GenRandomInt(int base,int range){
+    static double GenRandomInt(int base,int range){
         Random rand = new Random();
         int a = rand.nextInt(range+1);
         return base+a;
+    }
+    static double GenRandomDouble(int base,int range){
+        int max = base+range;
+        double b = ThreadLocalRandom.current().nextDouble(base,max+0.4f);
+        b = max<b? max:b;
+        return b;
     }
 
     // 判断车辆节点是否可用
