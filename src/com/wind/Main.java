@@ -121,7 +121,7 @@ public class Main {
     }
 
     /**
-     * 生成仅有对角线是0，其他数值在[min,max)的对角矩阵，左闭右开
+     * 生成仅有对角线是0，其他数值在[min,max]的对角矩阵，左闭右闭
      * @param dim 矩阵维度
      * @param max 最大值
      * @param min 最小值
@@ -185,7 +185,7 @@ public class Main {
     }
     static int GenRandomInt(int base,int range){
         Random rand = new Random();
-        int a = rand.nextInt(range);
+        int a = rand.nextInt(range+1);
         return base+a;
     }
 
