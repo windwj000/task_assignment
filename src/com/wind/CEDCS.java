@@ -10,13 +10,13 @@ public class CEDCS {
     static final int K=21;
     static final int M=10;
     static final int UNAVAILABLESTATE=100;
-    static final double D=5;
+    static final double D=5*1.85;
     static final double inputRSU=(double)2/(double)3;
     static final int areaLength=1000;
     static final int areaWidth=20;
     static final double disToTopo=250;
     static final double SPEED=30;
-    static final int experimentRound=1;
+    static final int experimentRound=50;
 
     static class Task{
         int index;    // 序号
@@ -453,8 +453,8 @@ public class CEDCS {
         for (int i = 0; i < K; i++) {
             double curComputation=tasks[i].getComputation();
             double curTransmission=tasks[i].getTransmission();
-            tasks[i].setComputation(curComputation);
-            tasks[i].setTransmission(curTransmission);
+            tasks[i].setComputation(curComputation*2);
+            tasks[i].setTransmission(curTransmission*2);
         }
 
         // 车辆
@@ -2061,16 +2061,16 @@ public class CEDCS {
 //            System.out.println();
 
             totalFinishTime=finishTimes[K-1][scheduleRes[K-1]];
-            System.out.println("total finish time: "+totalFinishTime);
+            /*System.out.println("total finish time: "+totalFinishTime);
             System.out.println("total cost: "+totalCost);
-            System.out.println();
+            System.out.println();*/
 
             if(totalFinishTime<=D){
                 serviceSuccessIdx++;
             }
             averageServiceCost+=totalCost;
         }
-        serviceSuccessRate=(double)(serviceSuccessIdx/experimentRound);
+        serviceSuccessRate=(double)(serviceSuccessIdx)/experimentRound;
         averageServiceCost=averageServiceCost/experimentRound;
         System.out.println("service success rate: "+serviceSuccessRate);
         System.out.println("average service cost: "+averageServiceCost);

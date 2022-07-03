@@ -13,8 +13,8 @@ public class testCases {
 //            System.out.println(CEDCS.Matix2Str(matrix));
 //            double[][] car_time = CEDCS.GenRandomCarInterval(dim, 0, 5, 15, 20);
 //            System.out.println(CEDCS.Matix2Str(car_time));
-            int[][] matrix = GA.GenRandomSquareMatrix();
-            System.out.println(GA.Matix2Str(matrix));
+            int[][] matrix = com.wind.GA.GenRandomSquareMatrix();
+            System.out.println(com.wind.GA.Matix2Str(matrix));
         }
     }
 }
